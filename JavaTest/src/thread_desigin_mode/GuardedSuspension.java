@@ -3,6 +3,8 @@ package thread_desigin_mode;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 /**
  * @author JasonYuan
  * 被守护而暂停执行(GuardedSuspension)）
@@ -36,7 +38,6 @@ public class GuardedSuspension {
     static class RequestQueue{
         private final Queue<Request> mQueue = new LinkedList<Request>();
 
-        public RequestQueue(){}
         public synchronized Request getRequest(){
             while(mQueue.peek() == null){
                 try {
@@ -54,6 +55,32 @@ public class GuardedSuspension {
         public synchronized void putRequest(Request request){
             this.mQueue.offer(request);
             this.notifyAll();
+        }
+    }
+    /**
+     * @author Jason Yuan
+     * 由于take方法和put方法互斥，都是线程安全的，所以不需要声明为sychronized方法。
+     */
+    static class RequestQueueByBlockingQueue{
+        private final BlockingQueue<Request> mQueue = new LinkedBlockingQueue<Request>();
+        
+        public Request getRequest(){
+            Request req = null;
+            try {
+                req = mQueue.take();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return req;
+        }
+        public void putRequest(Request request){
+            try {
+                mQueue.put(request);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
