@@ -1,15 +1,22 @@
 package thread_desigin_mode;
 
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingQueue;
-
+/**
+ * @author JasonYuan
+ * 被守护而暂停执行(GuardedSuspension)）
+ * <Li>存在循环<Li>
+ * <Li>存在条件检查<Li>
+ * <Li>因为某种原因而等待<Li>
+ */
 public class GuardedSuspension {
 
     public static void main(String[] args) {
         RequestQueue queue = new RequestQueue();
         Random random = new Random(3415927L);
         new Thread(new ClientThread(queue, random)).start();
+        new Thread(new ServerThread(queue, random)).start();
         new Thread(new ServerThread(queue, random)).start();
     }
     
@@ -27,11 +34,11 @@ public class GuardedSuspension {
     }
     
     static class RequestQueue{
-        private final Queue<Request> mQueue = new LinkedBlockingQueue<Request>();
+        private final Queue<Request> mQueue = new LinkedList<Request>();
 
         public RequestQueue(){}
         public synchronized Request getRequest(){
-            if(mQueue.peek() == null){
+            while(mQueue.peek() == null){
                 try {
                     System.out.println(Thread.currentThread() + " wait");
                     this.wait();
@@ -64,7 +71,7 @@ public class GuardedSuspension {
                 System.out.println(Thread.currentThread() + " putRequest "+request.toString());
                 mQueue.putRequest(request);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(mRandom.nextInt(1000));
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -86,7 +93,7 @@ public class GuardedSuspension {
                 Request request = mQueue.getRequest();
                 System.out.println(Thread.currentThread() + " getRequest "+request.toString());
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(mRandom.nextInt(1000));
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
