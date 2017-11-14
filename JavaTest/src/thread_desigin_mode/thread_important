@@ -1,0 +1,7 @@
+⒈关于wait、notify以及notifyAll
+ 凡事不可过于争论，特别是家人，注重修身养性。
+ （1）执行以上三个方法，线程必须持有锁，否则会抛出java.lang.IllegalMonitorStateException异常。
+ （2）三个方法都是java.lang.Object类的方法，不是Thread类中固有的方法。各功能如下：
+    obj.wait() 是将当前线程放入obj的等待队列中
+    obj.notify() 会从obj的等待队列中唤醒一个线程
+    obj.notifyAll() 会从obj的等待队列中唤醒所有线程
